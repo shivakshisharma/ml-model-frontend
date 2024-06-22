@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '';  
+const API_URL = 'http://localhost:5000/api'; // Replace with your actual backend URL
 
 export const predict = async (features) => {
   try {
