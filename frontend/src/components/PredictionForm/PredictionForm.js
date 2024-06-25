@@ -5,6 +5,7 @@ import { Box, CircularProgress } from "@mui/material";
 import { predict } from "../../services/api";
 import Output from "../Output/Output";
 import InputAdornment from '@mui/material/InputAdornment';
+import axios from 'axios'
 
 const PredictionForm = () => {
   const [formData, setFormData] = useState({
@@ -54,14 +55,16 @@ const PredictionForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setProgress(30);
     try {
-      setProgress(30);
-      const response = await predict(formData); // Assuming predict function handles API call
+      const featuresArray = Object.values(formData).map(value => parseFloat(value));
+      const response = await axios.post('http://localhost:5000/predict', { features: featuresArray });
+      setProgress(70);
+      setResult(response.data.prediction);
       setProgress(100);
-      setResult(response.prediction);
     } catch (error) {
-      console.error('Prediction error:', error);
-      // Handle error state or display error message
+      console.error('Error fetching prediction:', error);
+      setProgress(0);
     }
   };
 
