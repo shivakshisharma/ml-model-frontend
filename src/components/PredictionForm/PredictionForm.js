@@ -5,9 +5,15 @@ import { Box, CircularProgress } from "@mui/material";
 import { predict } from "../../services/api";
 import Output from "../Output/Output";
 import InputAdornment from '@mui/material/InputAdornment';
-import axios from 'axios'
+import axios from 'axios';
+import { UploadContext } from "../UploadContext";
+import { fieldMapping } from "../Mapping";
+import { useContext } from 'react';
+import { useEffect } from "react";
 
 const PredictionForm = () => {
+  const { uploadedData, setUploadedData } = useContext(UploadContext);
+
   const [formData, setFormData] = useState({
     "5mm": "",
     Mean_size_raw_mix_wet: "",
@@ -52,6 +58,13 @@ const PredictionForm = () => {
   const handleChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
+
+  useEffect(() => {
+    if (uploadedData) {
+      setFormData(uploadedData);
+    }
+  }, [uploadedData]);
+  console.log(formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

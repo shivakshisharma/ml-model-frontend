@@ -7,6 +7,10 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CustomizedDialogs from '../Dialog'; // Adjust the path if necessary
 import Dialog from '@mui/material/Dialog';
 import axios from 'axios';
+import { useContext } from 'react';
+import { UploadContext } from '../UploadContext'
+import { fieldMapping } from '../Mapping';
+import * as XLSX from 'xlsx';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -31,13 +35,30 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const Navbar = () => {
- 
+const { setUploadedData } = useContext(UploadContext);
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   const formData = new FormData();
   formData.append('file', file);
-
   try {
+    // Read the Excel file on the frontend
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    // Map the Excel data to the form fields
+    const mappedData = {};
+    worksheet.forEach(row => {
+      for (const key in row) {
+        if (fieldMapping[key]) {
+          mappedData[fieldMapping[key]] = row[key];
+        }
+      }
+    });
+
+    // Update the context with the mapped data
+    setUploadedData(mappedData);
     const response = await axios.post('http://localhost:5000/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -45,6 +66,7 @@ const handleFileUpload = async (event) => {
     });
     console.log('File upload successful:', response.data);
     // Handle success response
+
   } catch (error) {
     console.error('File upload failed:', error);
     // Handle error response
