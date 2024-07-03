@@ -59,6 +59,10 @@ const handleFileUpload = async (event) => {
 
     // Update the context with the mapped data
     setUploadedData(mappedData);
+    // Save to local storage
+    const jsonData = JSON.stringify(mappedData);
+    console.log('JSON data to be saved:', jsonData);
+    localStorage.setItem('uploadedData', jsonData);
     const response = await axios.post('http://localhost:5000/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -77,13 +81,13 @@ const handleFileUpload = async (event) => {
         <Box display='flex' alignItems='center' width='100%' justifyContent='space-between'>
         <Toolbar >
             <img src={Logo} alt="" height={50} style={{marginRight:"60px"}} />
-             <Typography variant="h6" mx={4} fontWeight="500" fontFamily="sans-serif" >SINTER RDI</Typography>
+             <Typography variant="h6" mx={4} fontWeight="700" fontFamily="sans-serif" ><b>SINTER RDI</b></Typography>
         </Toolbar>
         <Stack direction='row'  spacing={4} style={{marginRight:"70px",fontFamily:"sans-serif"}}>
            
            <CustomizedDialogs />
             <Button component="label" role={undefined} variant="contained" tabIndex={-1}  sx={{ marginLeft: 'auto' }} startIcon={<CloudUploadIcon />}>
-              Upload file
+             <b> Upload file</b>
            <VisuallyHiddenInput type="file" onChange={handleFileUpload} /> 
            </Button>
         </Stack>

@@ -11,16 +11,17 @@ const Output = ({result}) => {
     color={"white"}
     border={"1px solid grey"}
   >
-    <Typography variant="h5" fontWeight="500">
-      Output Data
+    <Typography variant="h5" fontWeight="500" textAlign={'center'} fontFamily={"calibri"}>
+    Predicted RDI Value
     </Typography>
     <Typography
       variant="h6"
       my={4}
       fontWeight="500"
-      sx={{ color: "#e1e1e1" }}
+      sx={{ color: "#e1e1e1",textAlign:"center" }}
+      
     >
-      Output : {(result !== null) && result}
+     {(result !== null) && result}
     </Typography>
   </Box>
   )

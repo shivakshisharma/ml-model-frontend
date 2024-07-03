@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { predict } from "../../services/api";
 import Output from "../Output/Output";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -44,7 +44,7 @@ const PredictionForm = () => {
     CI_of_Dolomite: "%",
     Basicity: "%",
     "Al2O3/SiO2": "%",
-    Main_Fan_Speed_RPM: "rpm",
+    "Main_Fan_Speed_RPM": "rpm",
     "avg BTP (range 400-450)": "°C",
     CaO: "%",
     "Balling Index (lower bound 1.55+)": "mm",
@@ -60,18 +60,39 @@ const PredictionForm = () => {
   };
 
   useEffect(() => {
+    // Load data from local storage if available
+    const savedData = localStorage.getItem('uploadedData');
+   
+  
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        
+        setFormData(parsedData);
+      } catch (error) {
+        console.error('Error parsing saved data:', error);
+        // If parsing fails, clear the local storage key
+        localStorage.removeItem('uploadedData');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (uploadedData) {
       setFormData(uploadedData);
+      
     }
   }, [uploadedData]);
   console.log(formData);
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setProgress(30);
     try {
-      const featuresArray = Object.values(formData).map(value => parseFloat(value));
-      const response = await axios.post('http://localhost:5000/predict', { features: featuresArray });
+      
+      const response = await axios.post('http://localhost:5000/predict');
       setProgress(70);
       setResult(response.data.prediction);
       setProgress(100);
@@ -80,6 +101,7 @@ const PredictionForm = () => {
       setProgress(0);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit} style={{ backgroundColor: "#121417", padding: "30px 0px" }}>
@@ -141,12 +163,17 @@ const PredictionForm = () => {
         </Box>
       </Box>
       <Button
+       component="label" 
+       variant="contained" 
+       tabIndex={-1} 
         type="submit"
-        variant="contained"
         color="primary"
-        sx={{ width: "200px", height: "50px", marginLeft: "120px", marginBottom: "60px" }}
+        
+       sx={{ width: "200px", height: "50px", marginLeft: "45%", marginBottom: "60px" }}
+       onClick={handleSubmit}
+
       >
-        Predict
+       <Typography sx={{fontFamily:"sans-serif",fontWeight:"70px"}}><b>Predict</b></Typography> 
       </Button>
       {progress > 0 && (
         <CircularProgress

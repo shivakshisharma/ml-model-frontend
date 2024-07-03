@@ -31,7 +31,7 @@ export default function CustomizedDialogs() {
   return (
     <React.Fragment>
       <Button component="label" variant="contained" onClick={handleClickOpen}>
-        RDI description
+      <b> RDI description</b> 
       </Button>
       <BootstrapDialog
         onClose={handleClose}
