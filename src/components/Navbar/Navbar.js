@@ -4,6 +4,7 @@ import { AppBar ,Toolbar,Stack,Box,Typography,Button} from '@mui/material'
 import Logo from "../../assests/jsw.png"
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CustomizedDialogs from '../Dialog'; // Adjust the path if necessary
 import Dialog from '@mui/material/Dialog';
 import axios from 'axios';
@@ -76,6 +77,23 @@ const handleFileUpload = async (event) => {
     // Handle error response
   }
 }
+const handleDownload = async () => {
+  try {
+    const response = await fetch('/download');
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'previous_results.csv';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
+};
+
   return (
     <AppBar position='static' color='primary'  >
         <Box display='flex' alignItems='center' width='100%' justifyContent='space-between'>
@@ -89,6 +107,10 @@ const handleFileUpload = async (event) => {
             <Button component="label" role={undefined} variant="contained" tabIndex={-1}  sx={{ marginLeft: 'auto' }} startIcon={<CloudUploadIcon />}>
              <b> Upload file</b>
            <VisuallyHiddenInput type="file" onChange={handleFileUpload} /> 
+           </Button>
+           <Button component="label" role={undefined} variant="contained" tabIndex={-1}  sx={{ marginLeft: 'auto' }} startIcon={<CloudDownloadIcon />}onClick={handleDownload}>
+             <b> Download Results</b>
+          
            </Button>
         </Stack>
         </Box>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Box, CircularProgress, Typography } from "@mui/material";
@@ -8,8 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import axios from 'axios';
 import { UploadContext } from "../UploadContext";
 import { fieldMapping } from "../Mapping";
-import { useContext } from 'react';
-import { useEffect } from "react";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const PredictionForm = () => {
   const { uploadedData, setUploadedData } = useContext(UploadContext);
@@ -54,24 +53,22 @@ const PredictionForm = () => {
 
   const [result, setResult] = useState(null);
   const [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [showCheckIcon, setShowCheckIcon] = useState(false);
 
   const handleChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
   useEffect(() => {
-    // Load data from local storage if available
     const savedData = localStorage.getItem('uploadedData');
-   
-  
+    console.log(savedData);
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData);
-        
         setFormData(parsedData);
       } catch (error) {
         console.error('Error parsing saved data:', error);
-        // If parsing fails, clear the local storage key
         localStorage.removeItem('uploadedData');
       }
     }
@@ -80,28 +77,37 @@ const PredictionForm = () => {
   useEffect(() => {
     if (uploadedData) {
       setFormData(uploadedData);
-      
     }
   }, [uploadedData]);
+
   console.log(formData);
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setProgress(30);
     try {
-      
       const response = await axios.post('http://localhost:5000/predict');
       setProgress(70);
-      setResult(response.data.prediction);
+      setResult(parseFloat(response.data.prediction.toFixed(2)));
       setProgress(100);
+      setShowCheckIcon(true);
     } catch (error) {
       console.error('Error fetching prediction:', error);
       setProgress(0);
     }
   };
-  
+
+  useEffect(() => {
+    let timer;
+    if (progress === 100) {
+      timer = setTimeout(() => {
+        setVisible(false);
+      }, 2000);
+    } else {
+      setVisible(true);
+    }
+    return () => clearTimeout(timer);
+  }, [progress]);
 
   return (
     <form onSubmit={handleSubmit} style={{ backgroundColor: "#121417", padding: "30px 0px" }}>
@@ -117,18 +123,17 @@ const PredictionForm = () => {
               margin="normal"
               fullWidth
               variant="filled"
-              sx={{ 
-                border: "1px solid grey", 
-                input: { color: "white" }, 
-                borderRadius:"2%",
-                ".MuiInputAdornment-root": { color: "white" }, // Ensure InputAdornment text is white
-                ".MuiFilledInput-root": { color: "white" } , // Ensure input text is white
-               
+              sx={{
+                border: "1px solid grey",
+                input: { color: "white" },
+                borderRadius: "2%",
+                ".MuiInputAdornment-root": { color: "white" },
+                ".MuiFilledInput-root": { color: "white" },
               }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">
-                   <span style={{ color: "white" }}>{units[name]}</span> 
+                    <span style={{ color: "white" }}>{units[name]}</span>
                   </InputAdornment>
                 ),
                 style: { color: "white" }
@@ -148,7 +153,7 @@ const PredictionForm = () => {
               margin="normal"
               fullWidth
               variant="filled"
-              sx={{ border: "1px solid grey", input: { color: "white" }, borderRadius:"2%" }}
+              sx={{ border: "1px solid grey", input: { color: "white" }, borderRadius: "2%" }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start" sx={{ color: "white" }}>
@@ -162,32 +167,49 @@ const PredictionForm = () => {
           ))}
         </Box>
       </Box>
-      <Button
-       component="label" 
-       variant="contained" 
-       tabIndex={-1} 
-        type="submit"
-        color="primary"
-        
-       sx={{ width: "200px", height: "50px", marginLeft: "45%", marginBottom: "60px" }}
-       onClick={handleSubmit}
-
-      >
-       <Typography sx={{fontFamily:"sans-serif",fontWeight:"70px"}}><b>Predict</b></Typography> 
-      </Button>
-      {progress > 0 && (
-        <CircularProgress
-          variant="determinate"
-          value={progress}
-          sx={{ marginLeft: "40px", marginBottom: "10px" }}
-        />
-      )}
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '40px', marginBottom: "60px" }}>
+        <Button
+          component="label"
+          variant="contained"
+          type="submit"
+          color="primary"
+          sx={{ width: "200px", height: "50px" }}
+          onClick={handleSubmit}
+        >
+          <Typography sx={{ fontFamily: "sans-serif", fontWeight: "700" }}>Predict</Typography>
+        </Button>
+        {visible && progress > 0 && (
+          <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center', marginLeft: "40px" }}>
+            <CircularProgress
+              variant="determinate"
+              value={progress}
+              sx={{
+                color: progress === 100 ? "green" : "defaultColor"
+              }}
+            />
+            {progress === 100 && showCheckIcon && (
+              <CheckCircleIcon
+                sx={{
+                  color: "green",
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  width: "100%",
+                  height: "100%",
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+            )}
+          </Box>
+        )}
+      </Box>
       <Output result={result} />
     </form>
   );
 };
 
 export default PredictionForm;
+
 
 // import React, { useState, useEffect } from "react";
 // import TextField from "@mui/material/TextField";
