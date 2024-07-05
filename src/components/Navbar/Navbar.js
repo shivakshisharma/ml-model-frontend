@@ -41,6 +41,7 @@ const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   const formData = new FormData();
   formData.append('file', file);
+  
   try {
     // Read the Excel file on the frontend
     const data = await file.arrayBuffer();
@@ -48,31 +49,33 @@ const handleFileUpload = async (event) => {
     const sheetName = workbook.SheetNames[0];
     const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-    // Map the Excel data to the form fields
-    const mappedData = {};
-    worksheet.forEach(row => {
-      for (const key in row) {
+      // Extract the last row from the worksheet
+      const lastRow = worksheet[worksheet.length - 1];
+
+      // Map the Excel data to the form fields
+      const mappedData = {};
+      for (const key in lastRow) {
         if (fieldMapping[key]) {
-          mappedData[fieldMapping[key]] = row[key];
+          mappedData[fieldMapping[key]] = lastRow[key];
         }
       }
-    });
-
-    // Update the context with the mapped data
-    setUploadedData(mappedData);
-    // Save to local storage
-    const jsonData = JSON.stringify(mappedData);
-    console.log('JSON data to be saved:', jsonData);
-    localStorage.setItem('uploadedData', jsonData);
+  
+      // Update the context with the mapped data
+      setUploadedData(mappedData);
+      // Save to local storage
+      const jsonData = JSON.stringify(mappedData);
+      localStorage.setItem('uploadedData', jsonData);
+        
+      // Append the JSON data to the form data
+       formData.append('jsonData', jsonData);
     const response = await axios.post('http://localhost:5000/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log('File upload successful:', response.data);
-    // Handle success response
 
-  } catch (error) {
+
+  }catch (error) {
     console.error('File upload failed:', error);
     // Handle error response
   }

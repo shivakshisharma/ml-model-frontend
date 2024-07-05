@@ -62,7 +62,8 @@ const PredictionForm = () => {
 
   useEffect(() => {
     const savedData = localStorage.getItem('uploadedData');
-    console.log(savedData);
+    const savedResult = localStorage.getItem('predictionResult');
+    
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData);
@@ -72,7 +73,12 @@ const PredictionForm = () => {
         localStorage.removeItem('uploadedData');
       }
     }
+    if (savedResult) {
+      setResult(parseFloat(savedResult));
+    }
+  
   }, []);
+
 
   useEffect(() => {
     if (uploadedData) {
@@ -80,7 +86,7 @@ const PredictionForm = () => {
     }
   }, [uploadedData]);
 
-  console.log(formData);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,9 +94,12 @@ const PredictionForm = () => {
     try {
       const response = await axios.post('http://localhost:5000/predict');
       setProgress(70);
-      setResult(parseFloat(response.data.prediction.toFixed(2)));
+      const prediction = parseFloat(response.data.prediction.toFixed(2));
+      setResult(prediction);
       setProgress(100);
       setShowCheckIcon(true);
+    // Save the prediction result to local storage
+    localStorage.setItem('predictionResult', prediction.toString());
     } catch (error) {
       console.error('Error fetching prediction:', error);
       setProgress(0);
