@@ -10,6 +10,7 @@ import { UploadContext } from "../UploadContext";
 import { fieldMapping } from "../Mapping";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
+
 const PredictionForm = () => {
   const { uploadedData, setUploadedData } = useContext(UploadContext);
 
@@ -117,6 +118,9 @@ const PredictionForm = () => {
     }
     return () => clearTimeout(timer);
   }, [progress]);
+
+
+
 
   return (
     <form onSubmit={handleSubmit} style={{ backgroundColor: "#121417", padding: "30px 0px" }}>

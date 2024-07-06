@@ -5,6 +5,7 @@ import Logo from "../../assests/jsw.png"
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import LogoutIcon from '@mui/icons-material/Logout';
 import CustomizedDialogs from '../Dialog'; // Adjust the path if necessary
 import Dialog from '@mui/material/Dialog';
 import axios from 'axios';
@@ -12,6 +13,8 @@ import { useContext } from 'react';
 import { UploadContext } from '../UploadContext'
 import { fieldMapping } from '../Mapping';
 import * as XLSX from 'xlsx';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -35,8 +38,10 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-const Navbar = () => {
+const Navbar = ({hideButtons}) => {
 const { setUploadedData } = useContext(UploadContext);
+const { isAuthenticated, logout } = useAuth();
+const navigate = useNavigate();
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   const formData = new FormData();
@@ -97,6 +102,13 @@ const handleDownload = async () => {
   }
 };
 
+
+  const handleLogout = () => {
+    // Clear authentication data here (if any)
+    // For example, clear localStorage or context values
+    navigate('/');
+  };
+
   return (
     <AppBar position='static' color='primary'  >
         <Box display='flex' alignItems='center' width='100%' justifyContent='space-between'>
@@ -104,6 +116,7 @@ const handleDownload = async () => {
             <img src={Logo} alt="" height={50} style={{marginRight:"60px"}} />
              <Typography variant="h6" mx={4} fontWeight="700" fontFamily="sans-serif" ><b>SINTER RDI</b></Typography>
         </Toolbar>
+        {!hideButtons && (
         <Stack direction='row'  spacing={4} style={{marginRight:"70px",fontFamily:"sans-serif"}}>
            
            <CustomizedDialogs />
@@ -115,7 +128,11 @@ const handleDownload = async () => {
              <b> Download Results</b>
           
            </Button>
+           <Button component="label"  variant="contained" startIcon={<LogoutIcon/>} onClick={handleLogout}>
+         <b>Logout</b> 
+        </Button>
         </Stack>
+        )}
         </Box>
     </AppBar>
   )
