@@ -54,8 +54,8 @@ const LoginForm = () => {
         onSubmit={handleLogin}
       >
         <Card sx={{ p: 4, textAlign: 'center' }}>
-        <img src={Logo} alt="" height={50}  />
-        <Typography variant="h6" mx={4}  fontFamily="arial" color="#333399"><b>SINTER RDI</b></Typography>
+        <img src={Logo} alt="" height={70}  />
+        <Typography variant="h6" mx={4}  fontFamily="arial" color="navy"><b>Sinter RDI Prediction System</b></Typography>
           <TextField
             required
             id="outlined-username"

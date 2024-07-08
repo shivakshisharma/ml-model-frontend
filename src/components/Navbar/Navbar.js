@@ -110,7 +110,7 @@ const handleDownload = async () => {
   };
 
   return (
-    <AppBar position='static' color='primary'  >
+    <AppBar position='sticky' color='primary'  >
         <Box display='flex' alignItems='center' width='100%' justifyContent='space-between'>
         <Toolbar >
             <img src={Logo} alt="" height={50} style={{marginRight:"60px"}} />
