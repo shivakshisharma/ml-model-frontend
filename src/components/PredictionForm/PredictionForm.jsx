@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography,Grid } from "@mui/material";
 import { predict } from "../../services/api";
 import Output from "../Output/Output";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -109,11 +109,6 @@ const fetchRealTimeData = async () => {
   }
 };
 
-// useEffect(() => {
-//   const interval = setInterval(fetchRealTimeData, 30000); // Fetch every 30 seconds
-
-//   return () => clearInterval(interval);
-// }, []);
 
 useEffect(() => {
   if (!uploadedData) {
@@ -160,19 +155,18 @@ const handlePredict = async (data) => {
 
   return (
     <form onSubmit={handleSubmit} style={{ backgroundColor: "#121417", padding: "30px 0px" }}>
-      <Box display="flex" justifyContent="space-between" width="100%" height="100%">
-        <Box display="flex" width="45%" gap="20px" flexDirection="column" px="120px" py="60px">
-          {Object.entries(formData).slice(0, 8).map(([name, value]) => (
+      <Grid container spacing={2} sx={{ padding: { xs: 2, md: 6 } }}>
+        {Object.entries(formData).map(([name, value], index) => (
+          <Grid item xs={12} md={6} key={name} sx={{ display: 'flex', justifyContent: 'center' }}>
             <TextField
-              key={name}
               label={name.split("_").join(" ")}
               name={name}
-              value={value} // Ensure value is not null
+              value={value}
               onChange={handleChange}
               margin="normal"
-              fullWidth
               variant="filled"
               sx={{
+                width: "80%",
                 border: "1px solid grey",
                 input: { color: "white" },
                 borderRadius: "2%",
@@ -182,40 +176,16 @@ const handlePredict = async (data) => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">
-                    <span style={{ color: "white" }}>{uploadedData?units[name]:units[fieldMapping[name]]}</span>
+                    <span style={{ color: "white" }}>{ units[fieldMapping[name]]?units[fieldMapping[name]]:units[name]  }</span>
                   </InputAdornment>
                 ),
                 style: { color: "white" }
               }}
               InputLabelProps={{ style: { color: "white" } }}
             />
-          ))}
-        </Box>
-        <Box display="flex" width="45%" gap="20px" flexDirection="column" px="120px" py="60px">
-          {Object.entries(formData).slice(8).map(([name, value]) => (
-            <TextField
-              key={name}
-              label={name.split("_").join(" ")}
-              name={name}
-              value={value} // Ensure value is not null            
-              onChange={handleChange}
-              margin="normal"
-              fullWidth
-              variant="filled"
-              sx={{ border: "1px solid grey", input: { color: "white" }, borderRadius: "2%" }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start" sx={{ color: "white" }}>
-                    <span style={{ color: "white" }}> {uploadedData?units[name]:units[fieldMapping[name]]}</span>
-                  </InputAdornment>
-                ),
-                style: { color: "white" }
-              }}
-              InputLabelProps={{ style: { color: "white" } }}
-            />
-          ))}
-        </Box>
-      </Box>
+          </Grid>
+        ))}
+      </Grid>
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '40px', marginBottom: "60px" }}>
         <Button
           component="label"
@@ -256,6 +226,7 @@ const handlePredict = async (data) => {
     </form>
   );
 };
+
 
 export default PredictionForm;
 

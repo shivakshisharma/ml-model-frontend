@@ -1,6 +1,6 @@
 
 import React from 'react'
-import { AppBar ,Toolbar,Stack,Box,Typography,Button} from '@mui/material'
+import { AppBar ,Toolbar,Stack,Box,Typography,Button, Menu, MenuItem, IconButton,Breadcrumbs} from '@mui/material'
 import Logo from "../../assests/jsw.png"
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -8,10 +8,13 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CustomizedDialogs from '../Dialog'; // Adjust the path if necessary
 import Dialog from '@mui/material/Dialog';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { useContext } from 'react';
+import { useContext,useState } from 'react';
 import { UploadContext } from '../UploadContext'
 import { fieldMapping } from '../Mapping';
+import MenuIcon from '@mui/icons-material/Menu';
 import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
@@ -41,6 +44,9 @@ const VisuallyHiddenInput = styled('input')({
 const Navbar = ({hideButtons}) => {
 const { setUploadedData } = useContext(UploadContext);
 const { isAuthenticated, logout } = useAuth();
+const theme = useTheme();
+const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+const [anchorEl, setAnchorEl] = useState(null);
 const navigate = useNavigate();
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
@@ -108,32 +114,68 @@ const handleDownload = async () => {
     // For example, clear localStorage or context values
     navigate('/');
   };
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
-    <AppBar position='sticky' color='primary'  >
-        <Box display='flex' alignItems='center' width='100%' justifyContent='space-between'>
-        <Toolbar >
-            <img src={Logo} alt="" height={50} style={{marginRight:"60px"}} />
-             <Typography variant="h6" mx={4} fontWeight="700" fontFamily="sans-serif" ><b>SINTER RDI</b></Typography>
+    <AppBar position='sticky' color='primary'>
+      <Box display='flex' alignItems='center' width='100%' justifyContent='space-between' px={isMobile ? 2 : 4}>
+        <Toolbar>
+          <img src={Logo} alt="Logo" height={50} style={{ marginRight: isMobile ? '10px' : '60px' }} />
+          <Typography variant="h6" fontWeight="700" fontFamily="sans-serif">
+            <b>SINTER RDI</b>
+          </Typography>
         </Toolbar>
         {!hideButtons && (
-        <Stack direction='row'  spacing={4} style={{marginRight:"70px",fontFamily:"sans-serif"}}>
-           
-           <CustomizedDialogs />
-            <Button component="label" role={undefined} variant="contained" tabIndex={-1}  sx={{ marginLeft: 'auto' }} startIcon={<CloudUploadIcon />}>
-             <b> Upload file</b>
-           <VisuallyHiddenInput type="file" onChange={handleFileUpload} /> 
-           </Button>
-           <Button component="label" role={undefined} variant="contained" tabIndex={-1}  sx={{ marginLeft: 'auto' }} startIcon={<CloudDownloadIcon />}onClick={handleDownload}>
-             <b> Download Results</b>
-          
-           </Button>
-           <Button component="label"  variant="contained" startIcon={<LogoutIcon/>} onClick={handleLogout}>
-         <b>Logout</b> 
-        </Button>
-        </Stack>
+          isMobile ? (
+            <>
+              <IconButton edge="end" color="inherit" aria-label="menu" onClick={handleMenuOpen}>
+                <MenuIcon />
+              </IconButton>
+              <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                <MenuItem onClick={handleMenuClose}>
+                  <CustomizedDialogs />
+                </MenuItem>
+                <MenuItem onClick={handleMenuClose}>
+                  <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+                    <b>Upload file</b> 
+                    <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
+                  </Button>
+                </MenuItem>
+                <MenuItem onClick={handleMenuClose}>
+                  <Button component="label" variant="contained" startIcon={<CloudDownloadIcon />} onClick={handleDownload}>
+                   <b>Download Results</b> 
+                  </Button>
+                </MenuItem>
+                <MenuItem onClick={handleMenuClose}>
+                  <Button component="label" variant="contained" startIcon={<LogoutIcon />} onClick={handleLogout}>
+                   <b>Logout</b> 
+                  </Button>
+                </MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <Stack direction='row' spacing={4} style={{ marginRight: '70px', fontFamily: 'sans-serif' }}>
+              <CustomizedDialogs />
+              <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+              <b>Upload file</b> 
+                <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
+              </Button>
+              <Button component="label" variant="contained" startIcon={<CloudDownloadIcon />} onClick={handleDownload}>
+              <b>Download Results</b> 
+              </Button>
+              <Button component="label" variant="contained" startIcon={<LogoutIcon />} onClick={handleLogout}>
+              <b>Logout</b>
+              </Button>
+            </Stack>
+          )
         )}
-        </Box>
+      </Box>
     </AppBar>
   )
 }
