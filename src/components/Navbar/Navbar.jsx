@@ -11,14 +11,15 @@ import Dialog from '@mui/material/Dialog';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { useContext,useState } from 'react';
+import { useContext,useState,useEffect } from 'react';
 import { UploadContext } from '../UploadContext'
 import { fieldMapping } from '../Mapping';
 import MenuIcon from '@mui/icons-material/Menu';
 import * as XLSX from 'xlsx';
+import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-
+import ResponsiveDateTimePickers from "../DatePicker";
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
@@ -48,6 +49,7 @@ const theme = useTheme();
 const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 const [anchorEl, setAnchorEl] = useState(null);
 const navigate = useNavigate();
+const [selectedDate,setSelectedDate]=useState(null);
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   const formData = new FormData();
@@ -107,6 +109,23 @@ const handleDownload = async () => {
     console.error('Error downloading file:', error);
   }
 };
+// /lasteupdatedDate
+const lasteUpdatedDate=async()=>{
+  try{
+    const response=await axios.get("http://localhost:5000/lasteupdatedDate");
+    const lastDate=response.data.CreatedAt;
+    console.log(lastDate);
+    const formattedDate = dayjs(lastDate);
+    setSelectedDate(formattedDate);
+  } catch (error) {
+    console.error('Error fetching date', error);
+  }
+}
+
+useEffect(() => {
+  lasteUpdatedDate(); // Call to fetch the last updated date on component mount
+}, []);
+
 
 
   const handleLogout = () => {
@@ -142,6 +161,9 @@ const handleDownload = async () => {
                   <CustomizedDialogs />
                 </MenuItem>
                 <MenuItem onClick={handleMenuClose}>
+                <ResponsiveDateTimePickers selectedDate={selectedDate} setSelectedDate={setSelectedDate} /> 
+                </MenuItem>
+                <MenuItem onClick={handleMenuClose}>
                   <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
                     <b>Upload file</b> 
                     <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
@@ -160,8 +182,9 @@ const handleDownload = async () => {
               </Menu>
             </>
           ) : (
-            <Stack direction='row' spacing={4} style={{ marginRight: '70px', fontFamily: 'sans-serif' }}>
+            <Stack direction='row' spacing={2} style={{ marginRight: '70px', fontFamily: 'sans-serif' }}>
               <CustomizedDialogs />
+              <ResponsiveDateTimePickers selectedDate={selectedDate} setSelectedDate={setSelectedDate} />   
               <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
               <b>Upload file</b> 
                 <VisuallyHiddenInput type="file" onChange={handleFileUpload} />

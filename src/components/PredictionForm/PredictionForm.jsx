@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Box, CircularProgress, Typography,Grid } from "@mui/material";
+import { Box, CircularProgress, Typography,Grid,Stack } from "@mui/material";
 import { predict } from "../../services/api";
 import Output from "../Output/Output";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -9,6 +9,7 @@ import axios from 'axios';
 import { UploadContext } from "../UploadContext";
 import { fieldMapping } from "../Mapping";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 
 
 const PredictionForm = () => {
@@ -51,9 +52,11 @@ const PredictionForm = () => {
     "avg F/C temp (range 1150-1200)": "°C",
     "M/C speed m/min": "m/min",
   };
-  console.log(units);
+  
 
   const [result, setResult] = useState(null);
+  const [rdiData, setRdiData] = useState([]);
+  const [lastdate,setlastdate]=useState(Date.now());
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(true);
   const [showCheckIcon, setShowCheckIcon] = useState(false);
@@ -95,6 +98,8 @@ const fetchRealTimeData = async () => {
     const response = await axios.get("http://localhost:5000/realtime-data");
     const fetchedData = response.data;
     console.log(fetchedData);
+    setlastdate(fetchedData.CreatedAt);
+    console.log(lastdate);
 
     // Compare fetched data with current formData
     const isDataDifferent = JSON.stringify(fetchedData) !== JSON.stringify(formData);
@@ -102,17 +107,41 @@ const fetchRealTimeData = async () => {
     if (isDataDifferent) {
       setFormData(fetchedData);
       localStorage.setItem("uploadedData", JSON.stringify(fetchedData));
-      await handleSubmit();
+      await handlePredict(fetchedData);
     }
   } catch (error) {
     console.error("Error fetching real-time data:", error);
   }
 };
 
+const fetchPiVisionRealTimeData = async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/specific-realtime-data");
+    const specificData = response.data;
+    console.log(specificData);
+
+    const updatedFormData = { ...formData, ...specificData };
+    setFormData(updatedFormData);
+    localStorage.setItem("uploadedData", JSON.stringify(updatedFormData));
+    // await handlePredict(updatedFormData); // Automatically trigger prediction
+  } catch (error) {
+    console.error("Error fetching specific real-time data:", error);
+  }
+};
+
+
+//To fetch the data after every 30 seconds
+useEffect(() => {
+  const interval = setInterval(fetchPiVisionRealTimeData, 30000); // Fetch specific inputs every 30 seconds
+  return () => clearInterval(interval);
+}, [formData]);
+
+
+//To fetch the data after the data is being updated in the Sinter RDI database.
 
 useEffect(() => {
   if (!uploadedData) {
-    const interval = setInterval(fetchRealTimeData, 30000); // Fetch every 30 seconds
+    const interval = setInterval(fetchRealTimeData, 3600000); // Fetch every one hour 
     return () => clearInterval(interval);
   }
 }, [uploadedData]);
@@ -155,6 +184,7 @@ const handlePredict = async (data) => {
 
   return (
     <form onSubmit={handleSubmit} style={{ backgroundColor: "#121417", padding: "30px 0px" }}>
+   
       <Grid container spacing={2} sx={{ padding: { xs: 2, md: 6 } }}>
         {Object.entries(formData).map(([name, value], index) => (
           <Grid item xs={12} md={6} key={name} sx={{ display: 'flex', justifyContent: 'center' }}>
