@@ -8,6 +8,7 @@ import Login from './components/Login/Login'
 import { UploadProvider } from './components/UploadContext';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './components/AuthContext';
+import { DateProvider } from './components/DateContext';
 
 const theme=createTheme({
   palette:{
@@ -22,6 +23,7 @@ const theme=createTheme({
 
 const App = () => {
   return (
+    <DateProvider>
     <UploadProvider>
      <AuthProvider>
       <ThemeProvider theme={theme}>
@@ -52,6 +54,7 @@ const App = () => {
     </AuthProvider>
 
     </UploadProvider>
+    </DateProvider>
      
 
  

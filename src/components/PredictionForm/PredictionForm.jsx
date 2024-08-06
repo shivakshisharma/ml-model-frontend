@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Box, CircularProgress, Typography,Grid,Stack } from "@mui/material";
+import { Box, CircularProgress, Typography,Grid,Stack,Switch } from "@mui/material";
 import { predict } from "../../services/api";
 import Output from "../Output/Output";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -56,14 +56,42 @@ const PredictionForm = () => {
 
   const [result, setResult] = useState(null);
   const [rdiData, setRdiData] = useState([]);
-  const [lastdate,setlastdate]=useState(Date.now());
+  const [lastdate,setlastdate]=useState();
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(true);
   const [showCheckIcon, setShowCheckIcon] = useState(false);
+   // Step 1: Toggle state for manual mode
+   const [manualMode, setManualMode] = useState(false);
+
 
   const handleChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
+
+  const handleToggleManualMode = (event) => {
+    const newMode = event.target.checked;
+    setManualMode(newMode);
+
+    // If manual mode is turned off, reset formData from local storage
+    if (!newMode) {
+      const savedData = localStorage.getItem('uploadedData');
+      const savedPred=localStorage.getItem('predictionResult');
+      if (savedData ) {
+        try {
+          const parsedData = JSON.parse(savedData);
+          setFormData(parsedData);
+        
+        } catch (error) {
+          console.error('Error parsing saved data:', error);
+          localStorage.removeItem('uploadedData');
+        }
+      }
+      if (savedPred) {
+        setResult(parseFloat(savedPred)); // Reset prediction result
+      }
+    }
+  };
+
 
   useEffect(() => {
     const savedData = localStorage.getItem('uploadedData');
@@ -130,33 +158,66 @@ const fetchPiVisionRealTimeData = async () => {
 };
 
 
-//To fetch the data after every 30 seconds
+// To fetch the specific inputs every 30 seconds
 useEffect(() => {
-  const interval = setInterval(fetchPiVisionRealTimeData, 30000); // Fetch specific inputs every 30 seconds
-  return () => clearInterval(interval);
-}, [formData]);
+  if (!manualMode) {
+    const interval = setInterval(fetchPiVisionRealTimeData, 30000); // Fetch specific inputs every 30 seconds
+    return () => clearInterval(interval);
+  }
+}, [manualMode, formData]); // Dependency on manualMode and formData
 
 
-//To fetch the data after the data is being updated in the Sinter RDI database.
-
+// To fetch the data after the data is being updated in the Sinter RDI database
 useEffect(() => {
-  if (!uploadedData) {
+  if (!uploadedData && !manualMode) {
     const interval = setInterval(fetchRealTimeData, 3600000); // Fetch every one hour 
     return () => clearInterval(interval);
   }
-}, [uploadedData]);
+}, [uploadedData, manualMode]); // Dependency on uploadedData and manualMode
+
  
 const handlePredict = async (data) => {
  
   setProgress(30);
   try {
-    const response = await axios.post('http://localhost:5000/predict');
+
+  const features = [
+    parseFloat(formData["Size5mm"]),
+    parseFloat(formData["MeanSizeRawMixWet"]),
+    parseFloat(formData["ProductSinterAbove40mm"]),
+    parseFloat(formData["FeO"]),
+    parseFloat(formData["MgO"]),
+    parseFloat(formData["CoalCI"]),
+    parseFloat(formData["LimeCI"]),
+    parseFloat(formData["DolomiteCI"]),
+    parseFloat(formData["Basicity"]),
+    parseFloat(formData["Al2O3_SiO2_Ratio"]),
+    parseFloat(formData["MainFanSpeedRPM"]),
+    parseFloat(formData["BTP"]),
+    parseFloat(formData["CaO"]),
+    parseFloat(formData["BallingIndex"]),
+    parseFloat(formData["FCTemp"]),
+    parseFloat(formData["MCSpeed"]),
+  ];
+
+    
+    console.log(data);
+    const response = manualMode
+      ? await axios.post('http://localhost:5000/predict-manual', {features}) // Use formData when in manual mode
+      : await axios.post('http://localhost:5000/predict'); // Use real-time data API);
+    
     setProgress(70);
     const prediction = parseFloat(response.data.prediction.toFixed(2));
     setResult(prediction);
     setProgress(100);
     setShowCheckIcon(true);
-    localStorage.setItem('predictionResult', prediction.toString());
+   if(!manualMode)
+    {
+      localStorage.setItem('predictionResult', prediction.toString());
+    } 
+    else{
+
+    }
   } catch (error) {
     console.error('Error fetching prediction:', error);
     setProgress(0);
@@ -184,7 +245,10 @@ const handlePredict = async (data) => {
 
   return (
     <form onSubmit={handleSubmit} style={{ backgroundColor: "#121417", padding: "30px 0px" }}>
-   
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+        <Typography sx={{ color: "white", marginRight: '10px' }}>Manual Mode:</Typography>
+        <Switch checked={manualMode} onChange={handleToggleManualMode} color="primary" />
+      </Box>
       <Grid container spacing={2} sx={{ padding: { xs: 2, md: 6 } }}>
         {Object.entries(formData).map(([name, value], index) => (
           <Grid item xs={12} md={6} key={name} sx={{ display: 'flex', justifyContent: 'center' }}>

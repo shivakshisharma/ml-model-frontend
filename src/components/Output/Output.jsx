@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
-
+import BasicArea from '../BasicArea';
 
 const Output = ({ result }) => {
   const theme = useTheme();
@@ -45,6 +45,9 @@ const Output = ({ result }) => {
       >
         {result !== null && result}
       </Typography>
+      <Box mt={4} width="100%">
+        <BasicArea />
+      </Box>
     </Box>
   );
 }

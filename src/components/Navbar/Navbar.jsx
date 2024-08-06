@@ -12,7 +12,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import { useContext,useState,useEffect } from 'react';
-import { UploadContext } from '../UploadContext'
+import { UploadContext } from '../UploadContext';
+import { DateContext } from '../DateContext';
 import { fieldMapping } from '../Mapping';
 import MenuIcon from '@mui/icons-material/Menu';
 import * as XLSX from 'xlsx';
@@ -49,7 +50,7 @@ const theme = useTheme();
 const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 const [anchorEl, setAnchorEl] = useState(null);
 const navigate = useNavigate();
-const [selectedDate,setSelectedDate]=useState(null);
+const { selectedDate, setSelectedDate } = useContext(DateContext);
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   const formData = new FormData();
