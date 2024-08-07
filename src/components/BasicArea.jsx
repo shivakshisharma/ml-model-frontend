@@ -3,10 +3,13 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } f
 import axios from 'axios';
 import { DateContext } from './DateContext';
 import dayjs from 'dayjs';
+import utc from 'dayjs-plugin-utc';
+dayjs.extend(utc);
 
 const BasicArea = () => {
   const { selectedDate } = useContext(DateContext);
   const [chartData, setChartData] = useState([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,10 +19,13 @@ const BasicArea = () => {
           const response = await axios.get('http://localhost:5000/getRDI', {
             params: { date: formattedDate }
           });
+          console.log(dayjs(response.data[0].CreatedAt).utc().format('hh:mm A'));
+        
 
           // Make sure to correctly map the data structure
           setChartData(response.data.map(item => ({
-            timestamp: new Date(item.CreatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+            // timestamp: new Date(item.CreatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+            timestamp: dayjs(item.CreatedAt).utc().format('hh:mm A'), // Displaying the time in a readable format
             value: item.RDIValue, // Ensure this matches the key in your data
           })));
         }
