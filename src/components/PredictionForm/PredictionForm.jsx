@@ -167,14 +167,19 @@ useEffect(() => {
 }, [manualMode, formData]); // Dependency on manualMode and formData
 
 
-// To fetch the data after the data is being updated in the Sinter RDI database
 useEffect(() => {
+  const fetchData = async () => {
+    await fetchRealTimeData(); // Fetch data immediately
+  };
+
+  // Fetch data immediately on mount
+  fetchData();
+
   if (!uploadedData && !manualMode) {
-    const interval = setInterval(fetchRealTimeData, 3600000); // Fetch every one hour 
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchRealTimeData, 3600000); // Fetch every one hour
+    return () => clearInterval(interval); // Clean up interval on unmount
   }
 }, [uploadedData, manualMode]); // Dependency on uploadedData and manualMode
-
  
 const handlePredict = async (data) => {
  
