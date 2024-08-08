@@ -48,6 +48,8 @@ const Navbar = ({hideButtons}) => {
 const { setUploadedData } = useContext(UploadContext);
 const { isAuthenticated, logout } = useAuth();
 const theme = useTheme();
+const API_URL = 'http://10.5.45.182:5000'; // Replace with your actual backend URL
+
 const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 const [anchorEl, setAnchorEl] = useState(null);
 const navigate = useNavigate();
@@ -83,7 +85,7 @@ const handleFileUpload = async (event) => {
         
       // Append the JSON data to the form data
        formData.append('jsonData', jsonData);
-    const response = await axios.post('http://localhost:5000/upload', formData, {
+    const response = await axios.post(`${API_URL}/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -114,7 +116,7 @@ const handleDownload = async () => {
 // /lasteupdatedDate
 const lasteUpdatedDate=async()=>{
   try{
-    const response=await axios.get("http://localhost:5000/lasteupdatedDate");
+    const response=await axios.get(`${API_URL}/lasteupdatedDate`);
     const lastDate=response.data.CreatedAt;
     console.log(lastDate);
     const formattedDate = dayjs(lastDate);
@@ -125,9 +127,17 @@ const lasteUpdatedDate=async()=>{
 }
 
 useEffect(() => {
-  lasteUpdatedDate(); // Call to fetch the last updated date on component mount
-}, []);
+  // Call to fetch the last updated date on component mount
+  lasteUpdatedDate();
 
+  // Set up an interval to fetch the last updated date every hour (3600000 milliseconds)
+  const intervalId = setInterval(() => {
+    lasteUpdatedDate();
+  }, 30000);
+
+  // Clean up the interval on component unmount
+  return () => clearInterval(intervalId);
+}, []);
 
 
   const handleLogout = () => {

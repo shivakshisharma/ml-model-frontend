@@ -10,6 +10,7 @@ import { UploadContext } from "../UploadContext";
 import { fieldMapping } from "../Mapping";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
+const API_URL = 'http://10.5.45.182:5000'; // Replace with your actual backend URL
 
 
 const PredictionForm = () => {
@@ -123,7 +124,7 @@ const PredictionForm = () => {
 //Fetch real time data 
 const fetchRealTimeData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/realtime-data");
+    const response = await axios.get(`${API_URL}/realtime-data`);
     const fetchedData = response.data;
     console.log(fetchedData);
     setlastdate(fetchedData.CreatedAt);
@@ -144,7 +145,7 @@ const fetchRealTimeData = async () => {
 
 const fetchPiVisionRealTimeData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/specific-realtime-data");
+    const response = await axios.get(`${API_URL}/specific-realtime-data`);
     const specificData = response.data;
     console.log(specificData);
 
@@ -176,7 +177,7 @@ useEffect(() => {
   fetchData();
 
   if (!uploadedData && !manualMode) {
-    const interval = setInterval(fetchRealTimeData, 3600000); // Fetch every one hour
+    const interval = setInterval(fetchRealTimeData, 60000); // Fetch every one hour
     return () => clearInterval(interval); // Clean up interval on unmount
   }
 }, [uploadedData, manualMode]); // Dependency on uploadedData and manualMode
@@ -208,8 +209,8 @@ const handlePredict = async (data) => {
     
     console.log(data);
     const response = manualMode
-      ? await axios.post('http://localhost:5000/predict-manual', {features}) // Use formData when in manual mode
-      : await axios.post('http://localhost:5000/predict'); // Use real-time data API);
+      ? await axios.post(`${API_URL}/predict-manual`, {features}) // Use formData when in manual mode
+      : await axios.post(`${API_URL}/predict`); // Use real-time data API);
     
     setProgress(70);
     const prediction = parseFloat(response.data.prediction.toFixed(2));
