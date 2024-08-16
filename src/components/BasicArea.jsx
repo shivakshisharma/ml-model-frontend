@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,LabelList  } from 'recharts'; // Correct imports
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,LabelList,CartesianGrid  } from 'recharts'; // Correct imports
 import axios from 'axios';
 import { DateContext } from './DateContext';
 import dayjs from 'dayjs';
@@ -57,25 +57,28 @@ const BasicArea = () => {
 
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={transformedData}>
-        <XAxis 
-          dataKey="x" 
-          label={{ value: 'Time', position: 'insideBottomRight', offset: -5, fill: 'white' }} 
-          stroke="pink" // Change X-axis line color
-          tick={{ fill: 'pink' }} // Change X-axis tick color
-        />
-        <YAxis 
-          label={{ value: 'RDI Value', angle: -90, position: 'insideLeft', fill: 'white' }} 
-          stroke="skyblue" // Change Y-axis line color
-          tick={{ fill: 'skyblue' }} // Change Y-axis tick color
-        />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="y" stroke="#8884d8" activeDot={{ r: 8 }}>
-        <LabelList dataKey="y" content={renderCustomLabel} /> {/* Add this line to display the values on the chart */}    
-        </Line>
-      </LineChart>
-    </ResponsiveContainer>
+    <LineChart data={transformedData}>
+      <CartesianGrid vertical={false} horizontal={true} stroke="grey" strokeDasharray={'3 3'}  strokeWidth="2"/> {/* Add grid lines */}
+      <XAxis 
+        dataKey="x" 
+        label={{ value: 'Time', position: 'insideBottomRight', offset: -5, fill: 'white' }} 
+        stroke="pink" // Change X-axis line color
+        tick={{ fill: 'pink' }} // Change X-axis tick color
+        axisLine={true}
+        tickLine={true}
+      />
+      <YAxis 
+        label={{ value: 'RDI Value', angle: -90, position: 'insideLeft', fill: 'white' }} 
+        stroke="skyblue" // Change Y-axis line color
+        tick={{ fill: 'skyblue' }} // Change Y-axis tick color
+      />
+      <Tooltip />
+      <Legend />
+      <Line type="monotone" dataKey="y" stroke="#8884d8" activeDot={{ r: 8 }}>
+        <LabelList dataKey="y" content={renderCustomLabel} /> {/* Display values on the chart */}
+      </Line>
+    </LineChart>
+  </ResponsiveContainer>
   );
 };
 
