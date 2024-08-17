@@ -177,7 +177,7 @@ useEffect(() => {
   fetchData();
 
   if (!uploadedData && !manualMode) {
-    const interval = setInterval(fetchRealTimeData, 60000); // Fetch every one hour
+    const interval = setInterval(fetchRealTimeData, 100000); // Fetch every one hour
     return () => clearInterval(interval); // Clean up interval on unmount
   }
 }, [uploadedData, manualMode]); // Dependency on uploadedData and manualMode
