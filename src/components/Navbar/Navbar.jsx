@@ -20,8 +20,11 @@ import * as XLSX from 'xlsx';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import ResponsiveDateTimePickers from "../DatePicker";
-import utc from 'dayjs-plugin-utc';
+import ResponsiveDateTimePickers from "../DateTimePicker";
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
@@ -48,7 +51,7 @@ const Navbar = ({hideButtons}) => {
 const { setUploadedData } = useContext(UploadContext);
 const { isAuthenticated, logout } = useAuth();
 const theme = useTheme();
-const API_URL = 'http://10.5.45.182:5000'; // Replace with your actual backend URL
+const API_URL = 'http://10.5.45.182:8081'; // Replace with your actual backend URL
 
 const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 const [anchorEl, setAnchorEl] = useState(null);
@@ -119,8 +122,11 @@ const lasteUpdatedDate=async()=>{
     const response=await axios.get(`${API_URL}/lasteupdatedDate`);
     const lastDate=response.data.CreatedAt;
     console.log(lastDate);
-    const formattedDate = dayjs(lastDate);
+    const formattedDate = dayjs.utc(lastDate);
+    console.log(formattedDate,"format");
     setSelectedDate(formattedDate);
+    console.log(selectedDate,"afterformat");
+  
   } catch (error) {
     console.error('Error fetching date', error);
   }
@@ -133,7 +139,7 @@ useEffect(() => {
   // Set up an interval to fetch the last updated date every hour (3600000 milliseconds)
   const intervalId = setInterval(() => {
     lasteUpdatedDate();
-  }, 30000);
+  }, 10000);
 
   // Clean up the interval on component unmount
   return () => clearInterval(intervalId);

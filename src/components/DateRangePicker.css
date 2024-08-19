@@ -1,0 +1,21 @@
+.App {
+    text-align: center;
+    margin: 20px;
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    margin-right: 10px;
+  }
+  
+  input {
+    margin-bottom: 20px;
+  }
+  .react-datepicker__day--selected {
+    background-color: #4caf50;
+    color: white;
+  }
+  
