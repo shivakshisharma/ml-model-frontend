@@ -5,6 +5,7 @@ import './DateRangePicker.css';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
+
 dayjs.extend(utc);
 
 const DateRangePicker = ({ onDatesChange }) => {
@@ -23,7 +24,7 @@ const DateRangePicker = ({ onDatesChange }) => {
   }, [startDate, endDate, onDatesChange]);
 
   return (
-    <div>
+    <div className="custom-date-picker">
       <h2>Select Date Range</h2>
       <div>
         <label>Start Date:</label>

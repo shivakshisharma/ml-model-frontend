@@ -42,7 +42,7 @@ const Output = ({ result }) => {
         variant={isMobile ? "h6" : "h5"} 
         fontWeight="700" 
         textAlign="center" 
-        fontFamily="calibri"
+        fontFamily='sans-serif'
         mb={2}
         sx={{ 
           color: "#f1f1f1",
