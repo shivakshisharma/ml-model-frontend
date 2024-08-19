@@ -1,10 +1,27 @@
 import React from 'react'
+import { useState } from 'react';
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 import BasicArea from '../BasicArea';
+import DateRangePicker from '../DateRange';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 const Output = ({ result }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+     // Set default start and end dates
+  const today = new Date();
+  const defaultEndDate = dayjs(today).format('YYYY-MM-DDTHH');
+   const defaultStartDate1 = new Date(today.setDate(today.getDate() - 7));
+   const defaultStartDate=dayjs(defaultStartDate1).format('YYYY-MM-DDTHH');
+  const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(defaultEndDate);
+
+  const handleDatesChange = (newStartDate, newEndDate) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+  };
 
   return (
     <Box
@@ -25,7 +42,7 @@ const Output = ({ result }) => {
         variant={isMobile ? "h6" : "h5"} 
         fontWeight="700" 
         textAlign="center" 
-        fontFamily="calibri"
+        fontFamily='sans-serif'
         mb={2}
         sx={{ 
           color: "#f1f1f1",
@@ -46,7 +63,8 @@ const Output = ({ result }) => {
         {result !== null && result}
       </Typography>
       <Box mt={4} width="100%">
-        <BasicArea />
+      <DateRangePicker onDatesChange={handleDatesChange} />
+      <BasicArea startDate={startDate} endDate={endDate} />
       </Box>
     </Box>
   );

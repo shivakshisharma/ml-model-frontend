@@ -11,6 +11,8 @@ import { useTheme } from '@mui/material/styles';
 
 export default function ResponsiveDateTimePickers({ selectedDate, setSelectedDate }) {
     const theme = useTheme();
+    const datedefault=Date.now();
+    console.log(selectedDate,"At Dattime");
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -54,7 +56,7 @@ export default function ResponsiveDateTimePickers({ selectedDate, setSelectedDat
                 },
           }}
         
-          defaultValue={dayjs('2022-04-17T15:30')}
+          defaultValue={dayjs(datedefault)}
         />
       </Box>
     </LocalizationProvider>
