@@ -1,7 +1,7 @@
 {
   "name": "sinter-mlmodel-frontend",
   "version": "0.1.0",
-  "proxy": "http://10.5.45.182:8081",
+  "proxy": "http://10.5.45.182:5000",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.13.0",

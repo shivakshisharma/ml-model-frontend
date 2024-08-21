@@ -10,7 +10,7 @@ import { UploadContext } from "../UploadContext";
 import { fieldMapping } from "../Mapping";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-const API_URL = 'http://10.5.45.182:8081'; // Replace with your actual backend URL
+const API_URL = 'http://10.5.45.182:5000'; // Replace with your actual backend URL
 
 
 const PredictionForm = () => {

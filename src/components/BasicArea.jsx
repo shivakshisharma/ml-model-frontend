@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
-const API_URL = "http://10.5.45.182:8081";
+const API_URL = "http://10.5.45.182:5000";
 
 const BasicArea = ({ startDate, endDate }) => {
 
@@ -16,16 +16,24 @@ const BasicArea = ({ startDate, endDate }) => {
       try {
         let formattedStartDate = dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss');
         let formattedEndDate = dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss');
-        console.log(formattedStartDate,formattedEndDate,"Console")
+       
 
         const response = await axios.get(`${API_URL}/getRDI`, {
           params: { startDate: formattedStartDate, endDate: formattedEndDate }
         });
+        console.log(response);
 
-        setChartData(response.data.map(item => ({
-          timestamp: dayjs(item.CreatedAt).utc().format('hh:mm A'),
+        const data = response.data.map(item => ({
+          timestamp: dayjs(item.CreatedAt).utc().format('YYYY-MM-DDTHH:mm:ss'),
+          date: dayjs(item.CreatedAt).utc().format("MM-DD"),
+          time: dayjs(item.CreatedAt).utc().format('hh:mm A'),
           value: item.RDIValue,
-        })));
+        }));
+
+        // Sort data by timestamp to ensure correct chronological order
+        data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        setChartData(data);
+        
       } catch (error) {
         console.error('Error fetching chart data:', error);
       }
@@ -40,7 +48,7 @@ const BasicArea = ({ startDate, endDate }) => {
     const { x, y, value, index } = props;
     const isLeft = index < chartData.length / 2;
     const dx = isLeft ? -20 : -2;
-    const dy = 20;
+    const dy = 18;
 
     return (
       <text x={x} y={y} dx={dx} dy={dy} fill="#00FF00" fontWeight="bold" fontSize={"20px"} textAnchor={isLeft ? 'start' : 'end'}>
@@ -48,8 +56,34 @@ const BasicArea = ({ startDate, endDate }) => {
       </text>
     );
   };
+  // CustomTick Component that uses date and time from the transformed data
+  const CustomTick = ({ x, y, payload }) => {
+    if (!payload || !payload.value) {
+      return null;
+    }
 
-  const transformedData = chartData.map(item => ({ x: item.timestamp, y: parseFloat(item.value).toFixed(2) }));
+    // Map x-axis value (timestamp) to your data and get the date
+    const tickData = chartData.find(data => dayjs(data.timestamp).format('YYYY-MM-DDTHH:mm:ss') === payload.value);
+    
+    if (!tickData) return null;
+
+    const { time, date } = tickData;
+
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={-10} textAnchor="middle" fill="pink" fontSize={12}>
+          {time}
+        </text>
+        <text x={0} y={0} dx={-10} dy={15} textAnchor="middle" fill="white" fontSize={12}>
+          {date}
+        </text>
+      </g>
+    );
+  };
+
+
+  const transformedData = chartData.map(item => ({ x: item.timestamp, y: parseFloat(item.value).toFixed(2),date1:item.date }))
+  console.log(transformedData,"Hey");
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -59,9 +93,10 @@ const BasicArea = ({ startDate, endDate }) => {
           dataKey="x"
           label={{ value: 'Time', position: 'insideBottomRight', offset: -5, fill: 'white' }}
           stroke="pink"
-          tick={{ fill: 'pink' }}
+          tick={<CustomTick />}
           axisLine={true}
           tickLine={true}
+          interval={0}  // Ensures that all ticks are displayed
         />
         <YAxis
           label={{ value: 'RDI Value', angle: -90, position: 'insideLeft', fill: 'white' }}

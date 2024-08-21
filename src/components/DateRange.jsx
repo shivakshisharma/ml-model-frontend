@@ -12,7 +12,7 @@ const DateRangePicker = ({ onDatesChange }) => {
   // Set default start and end dates
   const today = new Date();
   const defaultEndDate = new Date();
-  const defaultStartDate = new Date(today.setDate(today.getDate() - 7));
+  const defaultStartDate = new Date(today.setDate(today.getDate() - 3));
 
   const [startDate, setStartDate] = useState(defaultStartDate);
   const [endDate, setEndDate] = useState(defaultEndDate);

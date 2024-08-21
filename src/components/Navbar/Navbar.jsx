@@ -51,7 +51,7 @@ const Navbar = ({hideButtons}) => {
 const { setUploadedData } = useContext(UploadContext);
 const { isAuthenticated, logout } = useAuth();
 const theme = useTheme();
-const API_URL = 'http://10.5.45.182:8081'; // Replace with your actual backend URL
+const API_URL = 'http://10.5.45.182:5000'; // Replace with your actual backend URL
 
 const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 const [anchorEl, setAnchorEl] = useState(null);
