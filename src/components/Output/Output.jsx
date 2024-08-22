@@ -5,6 +5,7 @@ import BasicArea from '../BasicArea';
 import DateRangePicker from '../DateRange';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import CompGraph from '../ComparisonGraph';
 dayjs.extend(utc);
 
 const Output = ({ result }) => {
@@ -13,7 +14,7 @@ const Output = ({ result }) => {
      // Set default start and end dates
   const today = new Date();
   const defaultEndDate = dayjs(today).format('YYYY-MM-DDTHH');
-   const defaultStartDate1 = new Date(today.setDate(today.getDate() - 7));
+   const defaultStartDate1 = new Date(today.setDate(today.getDate() - 3));
    const defaultStartDate=dayjs(defaultStartDate1).format('YYYY-MM-DDTHH');
   const [startDate, setStartDate] = useState(defaultStartDate);
   const [endDate, setEndDate] = useState(defaultEndDate);
@@ -65,6 +66,7 @@ const Output = ({ result }) => {
       <Box mt={4} width="100%">
       <DateRangePicker onDatesChange={handleDatesChange} />
       <BasicArea startDate={startDate} endDate={endDate} />
+      <CompGraph startDate={startDate} endDate={endDate} />
       </Box>
     </Box>
   );

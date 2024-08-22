@@ -86,7 +86,7 @@ const BasicArea = ({ startDate, endDate }) => {
   console.log(transformedData,"Hey");
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={380}>
       <LineChart data={transformedData}>
         <CartesianGrid vertical={false} horizontal={true} stroke="grey" strokeDasharray={'3 3'} strokeWidth="2" />
         <XAxis
@@ -99,11 +99,11 @@ const BasicArea = ({ startDate, endDate }) => {
           interval={0}  // Ensures that all ticks are displayed
         />
         <YAxis
-          label={{ value: 'RDI Value', angle: -90, position: 'insideLeft', fill: 'white' }}
+          label={{ value: 'Predicted RDI', angle: -90, position: 'insideLeft', fill: 'white' }}
           stroke="skyblue"
           tick={{ fill: 'skyblue' }}
         />
-        <Tooltip />
+        <Tooltip contentStyle={{ backgroundColor: '#333', color: '#fff' }} />
         <Legend />
         <Line type="monotone" dataKey="y" stroke="#8884d8" activeDot={{ r: 8 }}>
           <LabelList dataKey="y" content={renderCustomLabel} />
