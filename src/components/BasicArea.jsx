@@ -10,38 +10,44 @@ const API_URL = "http://10.5.45.182:5000";
 const BasicArea = ({ startDate, endDate }) => {
 
   const [chartData, setChartData] = useState([]);
+  const [dateRange, setDateRange] = useState(0);
+
+  const fetchData = async () => {
+    try {
+      let formattedStartDate = dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss');
+      let formattedEndDate = dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss');
+     
+      const response = await axios.get(`${API_URL}/getRDI`, {
+        params: { startDate: formattedStartDate, endDate: formattedEndDate }
+      });
+      console.log(response);
+
+      const data = response.data.map(item => ({
+        timestamp: dayjs(item.CreatedAt).utc().format('YYYY-MM-DDTHH:mm:ss'),
+        date: dayjs(item.CreatedAt).utc().format("MM-DD"),
+        time: dayjs(item.CreatedAt).utc().format('hh:mm A'),
+        value: item.RDIValue,
+      }));
+
+      // Sort data by timestamp to ensure correct chronological order
+      data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      setChartData(data);
+
+      // Calculate the date range in days
+      const rangeInDays = dayjs(endDate).diff(dayjs(startDate), 'day');
+      setDateRange(rangeInDays);
+      
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let formattedStartDate = dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss');
-        let formattedEndDate = dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss');
-       
+    fetchData();  // Fetch data initially
 
-        const response = await axios.get(`${API_URL}/getRDI`, {
-          params: { startDate: formattedStartDate, endDate: formattedEndDate }
-        });
-        console.log(response);
+    const intervalId = setInterval(fetchData, 30000);  // Poll every 30 seconds
 
-        const data = response.data.map(item => ({
-          timestamp: dayjs(item.CreatedAt).utc().format('YYYY-MM-DDTHH:mm:ss'),
-          date: dayjs(item.CreatedAt).utc().format("MM-DD"),
-          time: dayjs(item.CreatedAt).utc().format('hh:mm A'),
-          value: item.RDIValue,
-        }));
-
-        // Sort data by timestamp to ensure correct chronological order
-        data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        setChartData(data);
-        
-      } catch (error) {
-        console.error('Error fetching chart data:', error);
-      }
-    };
-
-   
-      fetchData();
-    
+    return () => clearInterval(intervalId);  // Cleanup on component unmount
   }, [startDate, endDate]);
 
   const renderCustomLabel = (props) => {
@@ -56,13 +62,12 @@ const BasicArea = ({ startDate, endDate }) => {
       </text>
     );
   };
-  // CustomTick Component that uses date and time from the transformed data
+
   const CustomTick = ({ x, y, payload }) => {
     if (!payload || !payload.value) {
       return null;
     }
 
-    // Map x-axis value (timestamp) to your data and get the date
     const tickData = chartData.find(data => dayjs(data.timestamp).format('YYYY-MM-DDTHH:mm:ss') === payload.value);
     
     if (!tickData) return null;
@@ -81,9 +86,8 @@ const BasicArea = ({ startDate, endDate }) => {
     );
   };
 
-
-  const transformedData = chartData.map(item => ({ x: item.timestamp, y: parseFloat(item.value).toFixed(2),date1:item.date }))
-  console.log(transformedData,"Hey");
+  const transformedData = chartData.map(item => ({ x: item.timestamp, y: parseFloat(item.value).toFixed(2), date1: item.date }));
+  console.log(transformedData, "Hey");
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -96,7 +100,7 @@ const BasicArea = ({ startDate, endDate }) => {
           tick={<CustomTick />}
           axisLine={true}
           tickLine={true}
-          interval={0}  // Ensures that all ticks are displayed
+          interval={dateRange > 7 ? -1 : 0}  // Hide X-axis ticks if date range is greater than 8 days
         />
         <YAxis
           label={{ value: 'RDI Value', angle: -90, position: 'insideLeft', fill: 'white' }}
@@ -106,7 +110,7 @@ const BasicArea = ({ startDate, endDate }) => {
         <Tooltip />
         <Legend />
         <Line type="monotone" dataKey="y" stroke="#8884d8" activeDot={{ r: 8 }}>
-          <LabelList dataKey="y" content={renderCustomLabel} />
+          {dateRange <= 7 && <LabelList dataKey="y" content={renderCustomLabel} />}  // Conditionally render LabelList
         </Line>
       </LineChart>
     </ResponsiveContainer>

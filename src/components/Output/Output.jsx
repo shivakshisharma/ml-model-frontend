@@ -13,7 +13,7 @@ const Output = ({ result }) => {
      // Set default start and end dates
   const today = new Date();
   const defaultEndDate = dayjs(today).format('YYYY-MM-DDTHH');
-   const defaultStartDate1 = new Date(today.setDate(today.getDate() - 7));
+   const defaultStartDate1 = new Date(today.setDate(today.getDate() - 3));
    const defaultStartDate=dayjs(defaultStartDate1).format('YYYY-MM-DDTHH');
   const [startDate, setStartDate] = useState(defaultStartDate);
   const [endDate, setEndDate] = useState(defaultEndDate);

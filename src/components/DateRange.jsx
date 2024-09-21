@@ -4,12 +4,13 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './DateRangePicker.css';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-
+import { useDate } from './DateRangeContext';
 
 dayjs.extend(utc);
 
 const DateRangePicker = ({ onDatesChange }) => {
   // Set default start and end dates
+  const { setDateRange } = useDate(); // Get setDateRange from context
   const today = new Date();
   const defaultEndDate = new Date();
   const defaultStartDate = new Date(today.setDate(today.getDate() - 3));
@@ -22,6 +23,12 @@ const DateRangePicker = ({ onDatesChange }) => {
       onDatesChange(dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss'), dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss'));
     }
   }, [startDate, endDate, onDatesChange]);
+
+  useEffect(() => {
+    // Update context whenever start or end date changes
+    setDateRange({ startDate, endDate });
+  }, [startDate, endDate, setDateRange]);
+
 
   return (
     <div className="custom-date-picker">

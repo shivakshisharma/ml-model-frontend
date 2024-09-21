@@ -162,7 +162,7 @@ const fetchPiVisionRealTimeData = async () => {
 // To fetch the specific inputs every 30 seconds
 useEffect(() => {
   if (!manualMode) {
-    const interval = setInterval(fetchPiVisionRealTimeData, 30000); // Fetch specific inputs every 30 seconds
+    const interval = setInterval(fetchPiVisionRealTimeData, 30000); // Fetch specific inputs every 3 seconds
     return () => clearInterval(interval);
   }
 }, [manualMode, formData]); // Dependency on manualMode and formData
@@ -177,7 +177,7 @@ useEffect(() => {
   fetchData();
 
   if (!uploadedData && !manualMode) {
-    const interval = setInterval(fetchRealTimeData, 100000); // Fetch every one hour
+    const interval = setInterval(fetchRealTimeData, 60000); // Fetch every one hour
     return () => clearInterval(interval); // Clean up interval on unmount
   }
 }, [uploadedData, manualMode]); // Dependency on uploadedData and manualMode

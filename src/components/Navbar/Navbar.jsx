@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import ResponsiveDateTimePickers from "../DateTimePicker";
 import utc from 'dayjs/plugin/utc';
+import { useDate } from '../DateRangeContext';
 
 dayjs.extend(utc);
 
@@ -48,6 +49,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const Navbar = ({hideButtons}) => {
+  const { dateRange } = useDate();
 const { setUploadedData } = useContext(UploadContext);
 const { isAuthenticated, logout } = useAuth();
 const theme = useTheme();
@@ -101,19 +103,38 @@ const handleFileUpload = async (event) => {
   }
 }
 const handleDownload = async () => {
-  try {
-    const response = await fetch('/download');
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = 'previous_results.csv';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
+  if (dateRange.startDate && dateRange.endDate) {
+    const formattedStartDate = dayjs(dateRange.startDate).format('YYYY-MM-DDTHH:mm:ss');
+    const formattedEndDate = dayjs(dateRange.endDate).format('YYYY-MM-DDTHH:mm:ss');
+    console.log("Downloading data from", formattedStartDate, "to", formattedEndDate);
+
+    try {
+      const response = await axios.get(`${API_URL}/download`, {
+        params: {
+          start: formattedStartDate,
+          end: formattedEndDate,
+        },
+        responseType: 'blob', // Important for handling binary data
+      });
+
+      // Create a blob URL and trigger the download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      console.log(url);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'previous_results.csv';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    
+    } 
+    catch (error) {
     console.error('Error downloading file:', error);
+  }
+}
+  else {
+    alert("Please select a date range first.");
   }
 };
 // /lasteupdatedDate
