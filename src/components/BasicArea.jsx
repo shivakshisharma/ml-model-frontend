@@ -20,7 +20,7 @@ const BasicArea = ({ startDate, endDate }) => {
       const response = await axios.get(`${API_URL}/getRDI`, {
         params: { startDate: formattedStartDate, endDate: formattedEndDate }
       });
-      console.log(response);
+      
 
       const data = response.data.map(item => ({
         timestamp: dayjs(item.CreatedAt).utc().format('YYYY-MM-DDTHH:mm:ss'),
@@ -87,7 +87,7 @@ const BasicArea = ({ startDate, endDate }) => {
   };
 
   const transformedData = chartData.map(item => ({ x: item.timestamp, y: parseFloat(item.value).toFixed(2), date1: item.date }));
-  console.log(transformedData, "Hey");
+ 
 
   return (
     <ResponsiveContainer width="100%" height={300}>

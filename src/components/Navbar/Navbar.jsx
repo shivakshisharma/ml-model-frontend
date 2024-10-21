@@ -106,7 +106,7 @@ const handleDownload = async () => {
   if (dateRange.startDate && dateRange.endDate) {
     const formattedStartDate = dayjs(dateRange.startDate).format('YYYY-MM-DDTHH:mm:ss');
     const formattedEndDate = dayjs(dateRange.endDate).format('YYYY-MM-DDTHH:mm:ss');
-    console.log("Downloading data from", formattedStartDate, "to", formattedEndDate);
+    
 
     try {
       const response = await axios.get(`${API_URL}/download`, {
@@ -142,11 +142,11 @@ const lasteUpdatedDate=async()=>{
   try{
     const response=await axios.get(`${API_URL}/lasteupdatedDate`);
     const lastDate=response.data.CreatedAt;
-    console.log(lastDate);
+   
     const formattedDate = dayjs.utc(lastDate);
-    console.log(formattedDate,"format");
+   
     setSelectedDate(formattedDate);
-    console.log(selectedDate,"afterformat");
+    
   
   } catch (error) {
     console.error('Error fetching date', error);
@@ -167,11 +167,11 @@ useEffect(() => {
 }, []);
 
 
-  const handleLogout = () => {
-    // Clear authentication data here (if any)
-    // For example, clear localStorage or context values
-    navigate('/');
-  };
+const handleLogout = () => {
+ 
+  logout(); // Clear user data if using context
+  navigate('/'); // Redirect to login page
+};
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };

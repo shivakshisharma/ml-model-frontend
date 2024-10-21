@@ -15,7 +15,7 @@ const API_URL = 'http://10.5.45.182:5000'; // Replace with your actual backend U
 
 const PredictionForm = () => {
   const { uploadedData, setUploadedData } = useContext(UploadContext);
-
+  const [plantinShutdown, setPlantinShutdown] = useState(false);
   const [formData, setFormData] = useState({
     "5mm": "",
     Mean_size_raw_mix_wet: "",
@@ -126,16 +126,49 @@ const fetchRealTimeData = async () => {
   try {
     const response = await axios.get(`${API_URL}/realtime-data`);
     const fetchedData = response.data;
-    console.log(fetchedData);
+    const response2 = await axios.get(`${API_URL}/specific-realtime-data`);
+    const specificData = response2.data;
+    
     setlastdate(fetchedData.CreatedAt);
-    console.log(lastdate);
+   
 
     // Compare fetched data with current formData
     const isDataDifferent = JSON.stringify(fetchedData) !== JSON.stringify(formData);
-
+    
     if (isDataDifferent) {
-      setFormData(fetchedData);
-      localStorage.setItem("uploadedData", JSON.stringify(fetchedData));
+      // Filter out specified keys from fetched data
+      const { MainFanSpeedRPM, BTP, MCSpeed, FCTemp, ...filteredData } = fetchedData;
+      console.log(fetchedData);
+       // Check if MCSpeed is 0 and update state accordingly
+       if (specificData.MCSpeed === 0) {
+        setPlantinShutdown(true);
+        setFormData({
+          "Size5mm": "Bad Value",
+          Mean_size_raw_mix_wet: "Bad Value",
+          "+40mm_of_product_sinter": "Bad Value",
+          FeO: "Bad Value",
+          MgO: "Bad Value",
+          CI_of_Coal: "Bad Value",
+          "CI of Lime (range 85-90)": "Bad Value",
+          CI_of_Dolomite: "Bad Value",
+          Basicity: "Bad Value",
+          "Al2O3/SiO2": "Bad Value",
+          MainFanSpeedRPM: "Bad Value",
+          BTP: "Bad Value",
+          CaO: "Bad Value",
+          "Balling Index (lower bound 1.55+)": "Bad Value",
+          "FCTemp": "Bad Value",
+          "MCSpeed": "Bad Value",
+        });
+        setResult("PLANT IN SHUTDOWN");
+        return; // Early exit
+      }
+     
+      const Totalparams={ ...filteredData,...specificData};
+      console.log("Filtered Data",Totalparams);
+      setFormData(Totalparams);
+      
+      localStorage.setItem("uploadedData", JSON.stringify(Totalparams));
       await handlePredict(fetchedData);
     }
   } catch (error) {
@@ -147,16 +180,46 @@ const fetchPiVisionRealTimeData = async () => {
   try {
     const response = await axios.get(`${API_URL}/specific-realtime-data`);
     const specificData = response.data;
-    console.log(specificData);
-
+    console.log(specificData,"PI data");
+   
+    if (specificData.MCSpeed === 0) {
+      setPlantinShutdown(true);
+      setFormData({
+        "Size5mm": "Bad Value",
+        Mean_size_raw_mix_wet: "Bad Value",
+        "+40mm_of_product_sinter": "Bad Value",
+        FeO: "Bad Value",
+        MgO: "Bad Value",
+        CI_of_Coal: "Bad Value",
+        "CI of Lime (range 85-90)": "Bad Value",
+        CI_of_Dolomite: "Bad Value",
+        Basicity: "Bad Value",
+        "Al2O3/SiO2": "Bad Value",
+        MainFanSpeedRPM: "Bad Value",
+        BTP: "Bad Value",
+        CaO: "Bad Value",
+        "Balling Index (lower bound 1.55+)": "Bad Value",
+        "FCTemp": "Bad Value",
+        "MCSpeed": "Bad Value",
+      });
+      console.log("hey")
+      setResult("PLANT IN SHUTDOWN");
+      return; // Early exit
+    }
+   
     const updatedFormData = { ...formData, ...specificData };
+    
     setFormData(updatedFormData);
     localStorage.setItem("uploadedData", JSON.stringify(updatedFormData));
+    const savedData = localStorage.getItem('uploadedData');
+    console.log(savedData)
     // await handlePredict(updatedFormData); // Automatically trigger prediction
   } catch (error) {
     console.error("Error fetching specific real-time data:", error);
   }
 };
+
+
 
 
 // To fetch the specific inputs every 30 seconds
@@ -183,7 +246,11 @@ useEffect(() => {
 }, [uploadedData, manualMode]); // Dependency on uploadedData and manualMode
  
 const handlePredict = async (data) => {
- 
+  // if (plantinShutdown) {
+  //   // If the plant is in shutdown mode, skip prediction
+  //   return;
+  // }
+  
   setProgress(30);
   try {
 
@@ -206,8 +273,8 @@ const handlePredict = async (data) => {
     parseFloat(formData["MCSpeed"]),
   ];
 
+
     
-    console.log(data);
     const response = manualMode
       ? await axios.post(`${API_URL}/predict-manual`, {features}) // Use formData when in manual mode
       : await axios.post(`${API_URL}/predict`); // Use real-time data API);
@@ -261,10 +328,11 @@ const handlePredict = async (data) => {
             <TextField
               label={name.split("_").join(" ")}
               name={name}
-              value={value}
-              onChange={handleChange}
+              value={plantinShutdown ? "Bad Value" : (name === "MainFanSpeedRPM" && value < 700 ? "Bad Value" : value)}
+              onChange={manualMode ? handleChange : (e) => e.preventDefault()} 
               margin="normal"
               variant="filled"
+             
               sx={{
                 width: "80%",
                 border: "1px solid grey",
@@ -272,6 +340,9 @@ const handlePredict = async (data) => {
                 borderRadius: "2%",
                 ".MuiInputAdornment-root": { color: "white" },
                 ".MuiFilledInput-root": { color: "white" },
+                ...(name === "MainFanSpeedRPM" && value < 700 ? { input: { color: "red" } } : {}),
+                ...(plantinShutdown?{input:{color:"red"}}:{})
+                
               }}
               InputProps={{
                 endAdornment: (
@@ -323,6 +394,7 @@ const handlePredict = async (data) => {
         )}
       </Box>
       <Output result={result} />
+   
     </form>
   );
 };
