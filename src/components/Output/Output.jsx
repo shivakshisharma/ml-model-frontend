@@ -1,26 +1,36 @@
-import React from 'react'
-import { useState } from 'react';
+import React from 'react';
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 import BasicArea from '../BasicArea';
 import DateRangePicker from '../DateRange';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import CompGraph from '../ComparisonGraph';
 dayjs.extend(utc);
 
 const Output = ({ result }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-     // Set default start and end dates
+
+  // Set default start and end dates
   const today = new Date();
   const defaultEndDate = dayjs(today).format('YYYY-MM-DDTHH');
-   const defaultStartDate1 = new Date(today.setDate(today.getDate() - 3));
-   const defaultStartDate=dayjs(defaultStartDate1).format('YYYY-MM-DDTHH');
-  const [startDate, setStartDate] = useState(defaultStartDate);
-  const [endDate, setEndDate] = useState(defaultEndDate);
+  const defaultStartDate1 = new Date(today.setDate(today.getDate() - 3));
+  const defaultStartDate = dayjs(defaultStartDate1).format('YYYY-MM-DDTHH');
+
+  const [startDate, setStartDate] = React.useState(defaultStartDate);
+  const [endDate, setEndDate] = React.useState(defaultEndDate);
 
   const handleDatesChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
+  };
+
+  // Dummy data for prescriptive parameters
+  const prescriptiveParams = {
+    param1: "1170.78333",
+    param2: "2.6",
+    param3: "480",
+    param4: "930",
   };
 
   return (
@@ -40,7 +50,8 @@ const Output = ({ result }) => {
     >
       <Typography 
         variant={isMobile ? "h6" : "h5"} 
-        fontWeight="700" 
+        fontWeight="900" 
+        fontSize={"30px"}
         textAlign="center" 
         fontFamily='sans-serif'
         mb={2}
@@ -53,7 +64,8 @@ const Output = ({ result }) => {
       </Typography>
       <Typography
         variant={isMobile ? "h4" : "h3"}
-        fontWeight="700"
+        fontWeight="900"
+        fontSize={"50px"}
         sx={{ 
           color: "#00FF00", // Green color for the result
           textAlign: "center",
@@ -62,12 +74,16 @@ const Output = ({ result }) => {
       >
         {result !== null && result}
       </Typography>
+      
       <Box mt={4} width="100%">
-      <DateRangePicker onDatesChange={handleDatesChange} />
-      <BasicArea startDate={startDate} endDate={endDate} />
+        <DateRangePicker onDatesChange={handleDatesChange} />
+        <BasicArea startDate={startDate} endDate={endDate} />
+        <CompGraph startDate={startDate} endDate={endDate} />
       </Box>
+      
+    
     </Box>
   );
-}
+};
 
 export default Output;

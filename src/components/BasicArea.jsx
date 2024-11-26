@@ -11,6 +11,7 @@ const BasicArea = ({ startDate, endDate }) => {
 
   const [chartData, setChartData] = useState([]);
   const [dateRange, setDateRange] = useState(0);
+  const [dateRange, setDateRange] = useState(0);
 
   const fetchData = async () => {
     try {
@@ -110,6 +111,7 @@ const BasicArea = ({ startDate, endDate }) => {
         <Tooltip />
         <Legend />
         <Line type="monotone" dataKey="y" stroke="#8884d8" activeDot={{ r: 8 }}>
+          {dateRange <= 7 && <LabelList dataKey="y" content={renderCustomLabel} />}  // Conditionally render LabelList
           {dateRange <= 7 && <LabelList dataKey="y" content={renderCustomLabel} />}  // Conditionally render LabelList
         </Line>
       </LineChart>
