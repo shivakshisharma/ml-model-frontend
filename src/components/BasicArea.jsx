@@ -11,7 +11,7 @@ const BasicArea = ({ startDate, endDate }) => {
 
   const [chartData, setChartData] = useState([]);
   const [dateRange, setDateRange] = useState(0);
-  const [dateRange, setDateRange] = useState(0);
+ 
 
   const fetchData = async () => {
     try {
