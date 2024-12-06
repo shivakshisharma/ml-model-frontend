@@ -1,32 +1,30 @@
-# Stage 1: Build the React frontend
-FROM node:14 as build
+# Step 1: Build React app using Node.js
+FROM node:16 AS build
 
-# Set working directory
-WORKDIR /usr/src/app
+# Set the working directory in the container
+WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+# Copy package.json and package-lock.json (if present)
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy the rest of the React app
 COPY . .
 
 # Build the React app
 RUN npm run build
 
-# Stage 2: Production environment
+# Step 2: Serve the built React app with Nginx
 FROM nginx:alpine
 
-# Copy build output from Stage 1 to nginx directory
-COPY --from=build /usr/src/app/build /usr/share/nginx/html
-
-# Copy custom nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy the build folder from the previous image to Nginx's default directory
+COPY --from=build /app/build /usr/share/nginx/html
 
 # Expose port 80
-EXPOSE 3000
+EXPOSE 80
 
-# Start nginx to serve the frontend
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
+
