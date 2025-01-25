@@ -22,7 +22,7 @@ const CompGraph = ({ startDate, endDate }) => {
         // Transform the data
         const data = response.data.map(item => ({
           timestamp: dayjs(item.CreatedAt).utc().format('YYYY-MM-DDTHH:mm:ss'),
-          date: dayjs(item.CreatedAt).utc().format("MM-DD"),
+          date: dayjs(item.CreatedAt).utc().format("YYYY-MM-DD"),
           actual_RDI: item.ActualRDI,
           pred_RDI: item.PredictedRDI,
         }));

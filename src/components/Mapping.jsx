@@ -1,10 +1,12 @@
 // Mapping.js
 export const fieldMapping = {
     "Size5mm": "5mm",
-    "MeanSizeRawMixWet": "Mean_size_raw_mix_wet",
+    "MeanSize": "Mean_size",
+    "MeanSizeRawMixWet":"Mean_size_raw_mix_wet",
     "ProductSinterAbove40mm": "+40mm_of_product_sinter",
     "FeO": "FeO",
     "MgO": "MgO",
+    "MnO":"MnO",
     "CoalCI": "CI_of_Coal",
     "LimeCI": "CI of Lime (range 85-90)",
     "DolomiteCI": "CI_of_Dolomite",
@@ -16,6 +18,7 @@ export const fieldMapping = {
     "BallingIndex": "Balling Index (lower bound 1.55+)",
     "FCTemp": "avg F/C temp (range 1150-1200)",
     "MCSpeed": "M/C speed m/min",
+    "Flue_gas_temp":"FlueGasDustTemp"
   };
   
  

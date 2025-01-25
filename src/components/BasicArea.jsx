@@ -25,7 +25,7 @@ const BasicArea = ({ startDate, endDate }) => {
 
       const data = response.data.map(item => ({
         timestamp: dayjs(item.CreatedAt).utc().format('YYYY-MM-DDTHH:mm:ss'),
-        date: dayjs(item.CreatedAt).utc().format("MM-DD"),
+        date: dayjs(item.CreatedAt).utc().format("YYYY-MM-DD"),
         time: dayjs(item.CreatedAt).utc().format('hh:mm A'),
         value: item.RDIValue,
       }));
@@ -87,7 +87,7 @@ const BasicArea = ({ startDate, endDate }) => {
     );
   };
 
-  const transformedData = chartData.map(item => ({ x: item.timestamp, y: parseFloat(item.value).toFixed(2), date1: item.date }));
+  const transformedData = chartData.map(item => ({ x: item.timestamp, Pred_RDI: parseFloat(item.value).toFixed(2), date1: item.date }));
  
 
   return (
@@ -110,9 +110,9 @@ const BasicArea = ({ startDate, endDate }) => {
         />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="y" stroke="#8884d8" activeDot={{ r: 8 }}>
-          {dateRange <= 7 && <LabelList dataKey="y" content={renderCustomLabel} />}  // Conditionally render LabelList
-          {dateRange <= 7 && <LabelList dataKey="y" content={renderCustomLabel} />}  // Conditionally render LabelList
+        <Line type="monotone" dataKey="Pred_RDI" stroke="#8884d8" activeDot={{ r: 8 }}>
+          {dateRange <= 7 && <LabelList dataKey="Pred_RDI" content={renderCustomLabel} />}  // Conditionally render LabelList
+          {dateRange <= 7 && <LabelList dataKey="Pred_RDI" content={renderCustomLabel} />}  // Conditionally render LabelList
         </Line>
       </LineChart>
     </ResponsiveContainer>

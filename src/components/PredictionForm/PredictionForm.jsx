@@ -18,10 +18,12 @@ const PredictionForm = () => {
   const [plantinShutdown, setPlantinShutdown] = useState(false);
   const [formData, setFormData] = useState({
     "5mm": "",
-    Mean_size_raw_mix_wet: "",
+    Mean_size: "",
+    Mean_size_raw_mix_wet:"",
     "+40mm_of_product_sinter": "",
     FeO: "",
     MgO: "",
+    MnO:"",
     CI_of_Coal: "",
     "CI of Lime (range 85-90)": "",
     CI_of_Dolomite: "",
@@ -33,14 +35,18 @@ const PredictionForm = () => {
     "Balling Index (lower bound 1.55+)": "",
     "avg F/C temp (range 1150-1200)": "",
     "M/C speed m/min": "",
+    "FlueGasDustTemp":"",
+
   });
 
   const units = {
     "5mm": "mm",
     Mean_size_raw_mix_wet: "mm",
+    Mean_size: "mm",
     "+40mm_of_product_sinter": "mm",
     FeO: "%",
     MgO: "%",
+    MnO: "%",
     CI_of_Coal: "%",
     "CI of Lime (range 85-90)": "%",
     CI_of_Dolomite: "%",
@@ -52,6 +58,7 @@ const PredictionForm = () => {
     "Balling Index (lower bound 1.55+)": "mm",
     "avg F/C temp (range 1150-1200)": "°C",
     "M/C speed m/min": "m/min",
+    "FlueGasDustTemp":"°C",
   };
   
 
@@ -145,9 +152,11 @@ const fetchRealTimeData = async () => {
         setFormData({
           "Size5mm": "Bad Value",
           Mean_size_raw_mix_wet: "Bad Value",
+          Mean_size:"Bad Value",
           "+40mm_of_product_sinter": "Bad Value",
           FeO: "Bad Value",
           MgO: "Bad Value",
+          MnO:"Bad Value",
           CI_of_Coal: "Bad Value",
           "CI of Lime (range 85-90)": "Bad Value",
           CI_of_Dolomite: "Bad Value",
@@ -159,6 +168,7 @@ const fetchRealTimeData = async () => {
           "Balling Index (lower bound 1.55+)": "Bad Value",
           "FCTemp": "Bad Value",
           "MCSpeed": "Bad Value",
+          "Flue_gas_temp":"Bad Value"
         });
         setResult("PLANT IN SHUTDOWN");
         return; // Early exit
@@ -187,9 +197,11 @@ const fetchPiVisionRealTimeData = async () => {
       setFormData({
         "Size5mm": "Bad Value",
         Mean_size_raw_mix_wet: "Bad Value",
+        Mean_size:"Bad Value",
         "+40mm_of_product_sinter": "Bad Value",
         FeO: "Bad Value",
         MgO: "Bad Value",
+        MnO:"Bad Value",
         CI_of_Coal: "Bad Value",
         "CI of Lime (range 85-90)": "Bad Value",
         CI_of_Dolomite: "Bad Value",
@@ -201,6 +213,7 @@ const fetchPiVisionRealTimeData = async () => {
         "Balling Index (lower bound 1.55+)": "Bad Value",
         "FCTemp": "Bad Value",
         "MCSpeed": "Bad Value",
+        "Flue_gas_temp":"Bad Value"
       });
       console.log("hey")
       setResult("PLANT IN SHUTDOWN");
@@ -257,9 +270,11 @@ const handlePredict = async (data) => {
   const features = [
     parseFloat(formData["Size5mm"]),
     parseFloat(formData["MeanSizeRawMixWet"]),
+    parseFloat(formData["MeanSize"]),
     parseFloat(formData["ProductSinterAbove40mm"]),
     parseFloat(formData["FeO"]),
     parseFloat(formData["MgO"]),
+    parseFloat(formData["MnO"]),
     parseFloat(formData["CoalCI"]),
     parseFloat(formData["LimeCI"]),
     parseFloat(formData["DolomiteCI"]),
@@ -271,6 +286,7 @@ const handlePredict = async (data) => {
     parseFloat(formData["BallingIndex"]),
     parseFloat(formData["FCTemp"]),
     parseFloat(formData["MCSpeed"]),
+    parseFloat(formData["FlueGasDustTemp"]),
   ];
 
 
